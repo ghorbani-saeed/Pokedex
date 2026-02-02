@@ -1,4 +1,4 @@
-# Podex
+# Pokedex
 
 ## English
 Podex is a Pokémon project that allows users to search and view Pokémon details with interactive cards and overlays. Built with HTML, CSS, and JavaScript.
