@@ -1,0 +1,687 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "JosefinSans", sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: #a6a6a6 url("../assets/img/Website\ Background.jpg") no-repeat
+        fixed top;
+    background-size: cover;
+
+    &.o-hidden {
+        overflow: hidden; /*o-hidden = overflow: hidden, Verhindert, dass der Nutzer die Seite scrollt ,Wird dynamisch per JS an <body> angehängt oder entfernt*/
+    }
+
+    &.blur-filter {
+        /*erstmal niergendwo genunz wurde, sobald man sucht und nichts findet in funktion renderSearchPokemons diese classe für background unscharf machen addiert*/
+        backdrop-filter: blur(
+            10px
+        ); /*& steht für das aktuelle Element (in normalem CSS würde man .blur-filter direkt schreiben) UND blur(10px) → Hintergrund wird unscharf (10px Unschärfe)*/
+    }
+}
+
+header {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1920px;
+    margin: 0 150px;
+    padding: 0 16px;
+    width: 100%;
+
+    img {
+        width: 100px;
+    }
+    span {
+        color: white;
+        font-size: 40px;
+    }
+
+    a {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-decoration: none;
+    }
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    input {
+        padding: 7px 11px;
+        min-width: 260px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        box-shadow: 0 0 10px #f9fcb1;
+    }
+    .btns {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        gap: 8px;
+        button {
+            padding: 6px;
+            border-radius: 8px;
+            min-width: 124px;
+            min-height: 24px;
+
+            border: none;
+            cursor: pointer;
+            background: #08ff21;
+            box-shadow: 0 0 10px #f9fcb1;
+            transition: 0.2s ease;
+
+            &:hover {
+                box-shadow: 0 0 40px #f9fcb1;
+            }
+
+            &[type="reset"] {
+                background: #91321f;
+                color: white;
+            }
+        }
+    }
+}
+
+main {
+    flex: 1;
+    min-height: 86.9dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    .main-container {
+        max-width: 1920px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 30px 20px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        &.d-none {
+            display: none;
+        }
+    }
+
+    .empty-pokemon {
+        color: #07ff4d;
+        font-size: 30px;
+        text-align: center;
+        line-height: 50px;
+        filter: drop-shadow(2px 2px 2px black);
+    }
+
+    .load-more-button {
+        margin-bottom: 30px;
+        bottom: 20px;
+        padding: 40px;
+        min-width: 50px;
+        min-height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        background: green;
+        text-align: center;
+        color: #e3e3e3;
+        font-size: 24px;
+
+        &.d-none {
+            display: none;
+        }
+
+        &.disable {
+            background: #ccc0c0;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        &:hover:not(.disable) {
+            transform: scale(1.05);
+        }
+    }
+
+    .loading {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(30, 17, 12, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99;
+        img {
+            width: 250px;
+            transform-origin: center;
+            filter: invert(0.1) brightness(0.9) saturate(100%);
+        }
+    }
+}
+
+.pokemon {
+    width: 300px; 
+    min-height: 380px; 
+    background: rgb(255 255 255 / 65%);
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background-color: rgb(84, 84, 233);
+    transition: transform 0.2s ease;
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    .CardTopColor {
+        width: 400px;
+        height: 400px;
+        position: absolute;
+        top: -150px;
+        left: -17px;
+        z-index: 1;
+        transition: 0.3s ease-out;
+    }
+
+    .hp {
+        top: 25px;
+        border-radius: 10px !important;
+        right: 20px;
+        background: rgb(6, 147, 151);
+        color: white;
+        font-size: bold;
+        border-radius: 50px;
+        padding: 8px 13px;
+        font-size: 15px;
+        z-index: 2;
+    }
+
+    .main-info {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        img {
+            width: 300px;
+            margin-top: 60px;
+            transition: 0.3s ease-in;
+        }
+
+        h2 {
+            font-family: "bungee", sans-serif;
+            font-size: 25px;
+            text-transform: capitalize;
+            color: white;
+        }
+
+        .types {
+            display: flex;
+            gap: 10px;
+
+            span {
+                padding: 4px 9px;
+
+                color: rgb(45, 1, 1);
+                font-size: 12px;
+                text-transform: capitalize;
+            }
+        }
+    }
+
+    .powers {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+        color: white;
+
+        div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            span:first-child {
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5); 
+    width: 100%;
+    height: 100dvh;
+    min-height: 120%; 
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.pokemon-overlay {
+    height: 850px; 
+    max-height: 650px; 
+    overflow-y: auto; 
+    padding: 20px; 
+    overflow: hidden;
+    margin: 0 auto; 
+    margin-bottom: 140px;
+    .details {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        color: rgb(75, 12, 46);
+        font-weight: 700;
+        font-size: 18px;
+        .code {
+            padding-right: 28px;
+        }
+        .name {
+            padding-right: 8px;
+        }
+        .abilities {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+}
+
+.overlay {
+    position: fixed; 
+    background: rgb(0 0 0 / 55%);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.d-none {
+        display: none;
+    }
+
+    .pokemon-overlay {
+        width: 360px;
+        border-radius: 30px;
+        box-shadow: 0px 0px 20px #979797;
+        padding: 30px;
+        position: relative;
+
+        img.logo {
+            position: absolute;
+            top: 30px;
+            width: 200px;
+            right: 0;
+            opacity: 0.3;
+        }
+    }
+
+    .icons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        z-index: 20;
+
+        img {
+            width: 50px;
+            cursor: pointer;
+            filter: invert(1);
+            position: relative;
+            transition: all 0.2s ease;
+
+            &:nth-child(1):hover {
+                left: -6px;
+            }
+
+            &:nth-child(2):hover {
+                right: -6px;
+            }
+
+            &:nth-child(3):hover {
+                bottom: -6px;
+            }
+        }
+    }
+
+    .top {
+        position: relative;
+        margin-bottom: 200px;
+        margin-top: 100px;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+
+        img {
+            position: absolute;
+            top: -95px;
+            left: 5%;
+            filter: drop-shadow(5px 5px 6px rgb(0 0 0 / 0.5));
+            width: 300px;
+        }
+
+        h2 {
+            text-transform: capitalize;
+        }
+
+        .abilities {
+            display: flex;
+            gap: 5px;
+
+            span {
+                border-radius: 50px;
+                padding: 1px 5px;
+                font-size: 12px;
+                border: 1px solid white;
+                min-width: 45px;
+                text-align: center;
+                color: white;
+            }
+        }
+    }
+
+    .tabs {
+        display: flex;
+        justify-content: space-evenly;
+        color: black;
+        font-weight: 900;
+        font-size: 14px;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 10;
+
+        div {
+            cursor: pointer;
+            padding-bottom: 8px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+
+            &.active {
+                border-bottom: 3px solid rgb(71, 2, 2);
+                color: black;
+                cursor: default;
+            }
+
+            &:hover {
+                color: rgb(47, 9, 234);
+            }
+        }
+    }
+
+    .tabsDetail {
+        height: auto;
+    }
+
+    .detail {
+        color: rgb(65, 39, 9);
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+
+        &.d-none {
+            display: none;
+        }
+        /*.detail = der Wrapper für die Pokémon-Statistik-Blöcke
+                 .detail > div = Grid-Container für die einzelnen Stats (z. B. HP, Attack, Defense …)
+                 .detail > div > div = Flex-Container innerhalb jedes Stats, damit der Inhalt (Titel, Balken, etc.) sauber zentriert ist
+                 .detail                                    <-- Wrapper
+                  └── div (Grid-Container)             <-- display: grid
+                     ├── div (Flex-Container für 1. Stat)  <-- display: flex
+                     ├── div (Flex-Container für 2. Stat)
+                     └── div (Flex-Container für 3. Stat)   
+                  Grid-Container: verteilt die Stat-Blöcke nebeneinander oder nach Grid-Regeln
+                  Flex-Container: sorgt dafür, dass Inhalt jedes Blocks sauber zentriert ist    
+                  
+                  Ein Wrapper ist einfach ein Container-Element, das andere Elemente umhüllt.
+                  Meistens ein <div>
+                  Dient dazu, Struktur zu geben, Positionierung oder Layout zu kontrollieren
+                  Hat oft CSS-Regeln, um Inhalte zu gruppieren oder zu zentrieren
+                  <div class="detail">   <!-- Wrapper -->
+                    <div>              <!-- Grid-Container -->
+                        <div>...</div> <!-- Flex-Container / Item -->
+                        <div>...</div>
+                    </div>
+                  </div>
+                  
+                  */
+        > div {
+            /* " > " sorgt dafür, dass nur die direkten Kinder von .detail betroffen sind. Untergeordnete divs, die tiefer verschachtelt sind, werden nicht verändert.*/
+            display: grid;
+            gap: 16px;
+            text-align: center;
+            box-sizing: border-box;
+
+            > div {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+        }
+    }
+
+    .status {
+        &.d-none {
+            display: none;
+        }
+
+        > div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .title {
+                width: 120px;
+                text-align: left;
+                font-size: 14px;
+                text-transform: capitalize;
+                color: rgb(21, 1, 1);
+                font-weight: 700;
+            }
+        }
+    }
+
+    .shapes {
+        &.d-none {
+            display: none;
+        }
+    }
+}
+
+.progressbar {
+    box-sizing: border-box;
+    height: 20px; 
+    position: relative;
+    background: rgba(231, 103, 105, 0.3);
+    border-radius: 25px;
+    border: 2px solid black; 
+    overflow: hidden;
+    flex: 1;
+    padding-bottom: 4px;
+    span {
+        display: block;
+        height: 100%;
+        height: 16px;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+        background-color: rgb(6, 244, 26); 
+        box-shadow:
+            inset 0 2px 9px rgba(1, 84, 12, 0.3),
+            inset 0 -2px 6px rgba(4, 233, 65, 0.4);
+            position: relative;
+            overflow: hidden;
+       }
+}
+
+.orange > span {
+    background-image: linear-gradient(#f1a165, #f36d0a);
+}
+
+.red > span {
+    background-image: linear-gradient(#f0a3a3, #f42323);
+}
+
+.nostripes > span > span,
+.nostripes > span::after {
+    background-image: none;
+}
+
+footer {
+    height: 100px;
+    background: green;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    position: relative;
+    margin-top: 150px;
+    padding: 24px;
+
+    .footer_container {
+        width: 1440px;
+        padding: 30px 0;
+        text-align: center;
+        font-size: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        p{
+            margin-block-start: 0;
+           margin-block-end: 0;
+        }
+    }
+}
+
+@media (max-width: 1500px) {
+    .overlay .pokemon-overlay {
+        margin-top: 40px; /* 🔽 schiebt Overlay nach unten */
+    }
+     .pokemon-overlay {
+        margin-bottom: 200px; 
+    }
+}
+
+@media (max-width: 1330px) {
+    header .header-container {
+        flex-direction: column;
+        gap: 25px;
+        margin-top: 24px;
+        img {
+            width: 90px;
+        }
+        span {
+            font-size: 30px;
+        }
+
+        form {
+            padding-bottom: 10px !important;
+        }
+    }
+    .overlay {
+        align-items: flex-start; 
+        padding-top: 210px; 
+        padding-bottom: 300px !important;
+        top: -100px;
+    }
+
+    .pokemon-overlay {
+        margin: 0 auto; 
+    }
+
+    footer {
+        position: relative;
+        margin-top: 150px;
+    }
+}
+
+@media (max-width: 657px) {
+    .overlay .pokemon-overlay {
+        width: 320px;
+    }
+    .overlay .top img {
+        width: 280px; 
+    }
+
+    .overlay-types {
+        font-size: 16px !important; 
+    }
+}
+
+@media (max-width: 500px) {
+    header form {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 450px) {
+    .overlay .top {
+        margin-bottom: 30px;
+        margin-top: 200px;
+    }
+    .overlay .pokemon-overlay {
+        width: 260px;
+        height: auto;
+    }
+    .pokemon-overlay {
+        .details {
+            font-size: 16px;
+        }
+    }
+    .overlay .top img {
+        display: flex;
+        justify-content: center;
+        width: 200px;
+        right: -20px;
+        top: -187px;
+    }
+}
+
+@media (max-width: 350px) {
+    .pokemon:hover {
+        transform: none;
+    }
+
+    .pokemon {
+        transition: none;
+    }
+    footer {
+        .footer_container {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+}
+

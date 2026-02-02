@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokedex</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="shortcut icon" href="./assets/img/favicon.jpg" type="image/x-icon" />
+    
+    <link rel="stylesheet" href="./styles/overlay.css" />
+    <link rel="stylesheet" href="./styles/TypeColor.css" />
+    <link rel="stylesheet" href="./styles/responsive.css" />
+    <link rel="stylesheet" href="./styles/main.css">
+
+    <script src="./scripts/color.js"></script>
+    <script src="./scripts/main.js"></script>
+    <script src="./scripts/template.js"></script>
+  </head>
+  
+  <body onload="init()" class="o-hidden overlay-active">
+      <div class="overlay d-none" id="overlay" onclick="closeDetail(this,event)"></div>
+    <header>
+      <div class="header-container">
+       <a href="#">
+         <img src="./assets/img/logo_header.png" alt="logo"/>
+         <span>POKEMON</span>
+       </a>
+        <div>
+          <form onsubmit="submitSearchForm(this,event)" onreset=" resetSearchForm() ">
+            <input id="inputFieldId" type="text" name="search" placeholder="search..." />
+            <div class="btns">
+              <button type="submit">search</button>
+              <button type="reset">Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="main-container" id="pokemons"></div>
+
+      <div class="main-container" id="search-pokemons"></div>
+
+      <button onclick="loadMorePositiveSearchbtn()" class="load-more-button" id="load-search-btn" style="display: none;">Load More</button>
+
+      <button onclick="resetSearchForm()" class="load-more-button" id="search-Negativ-result-btn-reset" style="display: none;">Reset</button>
+
+      <div class="loading" id="loading">
+        <img id="Wheel" src="./assets/img/load_pokeball.png" alt="loading" />
+      </div>
+
+      <div class="load-more-button disable" id="load-more-button" onclick="lodeMorePokemon()">More Pokemons</div>
+    
+    </main>
+    <footer>
+      <div class="footer_container">
+        <p>Created by Saeed Ghorbani</p>
+        <p>&copy; Copyright 2026 - Open Source</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
