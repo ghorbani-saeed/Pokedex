@@ -11,14 +11,14 @@
 
     <link rel="shortcut icon" href="./assets/img/favicon.jpg" type="image/x-icon" />
     
-    <link rel="stylesheet" href="./styles/overlay.css" />
-    <link rel="stylesheet" href="./styles/TypeColor.css" />
-    <link rel="stylesheet" href="./styles/responsive.css" />
     <link rel="stylesheet" href="./styles/main.css">
 
+    <audio id="hit-sound" src="assets/sounds/olgaxnoel-mouth-pop-soft-asmr-pop-sound-348830.mp3" preload="auto"></audio>
+
+
     <script src="./scripts/color.js"></script>
+    <script src="scripts/template.js"></script>
     <script src="./scripts/main.js"></script>
-    <script src="./scripts/template.js"></script>
   </head>
   
   <body onload="init()" class="o-hidden overlay-active">
@@ -26,11 +26,11 @@
     <header>
       <div class="header-container">
        <a href="#">
-         <img src="./assets/img/logo_header.png" alt="logo"/>
-         <span>POKEMON</span>
+         <img id="logo-rotate-sound" src="./assets/img/logo_header.png" onclick="resetViaLogo()" alt="logo"/>
+         <span id="text-move-sound">POKEMON</span>
        </a>
         <div>
-          <form onsubmit="submitSearchForm(this,event)" onreset=" resetSearchForm() ">
+          <form onsubmit="submitSearchForm(this,event)" onreset="resetViaLogo()">
             <input id="inputFieldId" type="text" name="search" placeholder="search..." />
             <div class="btns">
               <button type="submit">search</button>
@@ -45,15 +45,14 @@
 
       <div class="main-container" id="search-pokemons"></div>
 
-      <button onclick="loadMorePositiveSearchbtn()" class="load-more-button" id="load-search-btn" style="display: none;">Load More</button>
-
-      <button onclick="resetSearchForm()" class="load-more-button" id="search-Negativ-result-btn-reset" style="display: none;">Reset</button>
+      <button onclick="resetNegativSearchBtn()" class="load-more-button" id="search-Negativ-result-btn-reset" style="display: none;">Reset</button>
 
       <div class="loading" id="loading">
         <img id="Wheel" src="./assets/img/load_pokeball.png" alt="loading" />
       </div>
 
-      <div class="load-more-button disable" id="load-more-button" onclick="lodeMorePokemon()">More Pokemons</div>
+      <div class="load-more-button" id="load-more-button" onclick="
+      kemon()" style="display: none;">More Pokemons</div>
     
     </main>
     <footer>

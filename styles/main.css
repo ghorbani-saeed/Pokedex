@@ -5,22 +5,48 @@
     font-family: "JosefinSans", sans-serif;
 }
 
+@keyframes pokeball-move {
+    0% {
+        transform: translateX(0) rotate(0deg);
+    }
+    60% {
+        transform: translateX(40px) rotate(360deg);
+    }
+    100% {
+        transform: translateX(5px) rotate(360deg);
+    }
+}
+
+@keyframes text-bump {
+    0% {
+        transform: translateX(0);
+    }
+    40% {
+        transform: translateX(300px); 
+    }
+    100% {
+        transform: translateX(0); 
+    }
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
 body {
     display: flex;
     flex-direction: column;
+    min-height: 100dvh;
     background: #a6a6a6 url("../assets/img/Website\ Background.jpg") no-repeat
         fixed top;
     background-size: cover;
-
     &.o-hidden {
-        overflow: hidden; /*o-hidden = overflow: hidden, Verhindert, dass der Nutzer die Seite scrollt ,Wird dynamisch per JS an <body> angehängt oder entfernt*/
+        overflow: hidden; 
     }
-
     &.blur-filter {
-        /*erstmal niergendwo genunz wurde, sobald man sucht und nichts findet in funktion renderSearchPokemons diese classe für background unscharf machen addiert*/
-        backdrop-filter: blur(
-            10px
-        ); /*& steht für das aktuelle Element (in normalem CSS würde man .blur-filter direkt schreiben) UND blur(10px) → Hintergrund wird unscharf (10px Unschärfe)*/
+        backdrop-filter: blur( 10px); 
     }
 }
 
@@ -41,12 +67,18 @@ header {
 
     img {
         width: 100px;
+        &.ball-animate {
+            animation: pokeball-move 1.2s ease-out forwards;
+            cursor: pointer;
+        }
     }
     span {
         color: white;
         font-size: 40px;
+        &.text-animate {
+            animation: text-bump 0.6s ease-out 0.5s forwards;
+        }
     }
-
     a {
         display: flex;
         align-items: center;
@@ -100,7 +132,7 @@ form {
 
 main {
     flex: 1;
-    min-height: 86.9dvh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -130,7 +162,6 @@ main {
 
     .load-more-button {
         margin-bottom: 30px;
-        bottom: 20px;
         padding: 40px;
         min-width: 50px;
         min-height: 50px;
@@ -144,16 +175,6 @@ main {
         &.d-none {
             display: none;
         }
-
-        &.disable {
-            background: #ccc0c0;
-            box-shadow: none;
-            cursor: default;
-        }
-
-        &:hover:not(.disable) {
-            transform: scale(1.05);
-        }
     }
 
     .loading {
@@ -162,11 +183,13 @@ main {
         right: 0;
         bottom: 0;
         left: 0;
-        background: rgba(30, 17, 12, 0.5);
-        display: flex;
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 17, 12, 0.8) !important;
+        display: none;
         justify-content: center;
         align-items: center;
-        z-index: 99;
+        z-index: 10000;
         img {
             width: 250px;
             transform-origin: center;
@@ -175,9 +198,26 @@ main {
     }
 }
 
+.loading.active {
+    display: flex !important;
+}
+
+.spin-animation {
+    animation: rotatePokeball 2s linear infinite;
+}
+
+@keyframes rotatePokeball {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .pokemon {
-    width: 300px; 
-    min-height: 380px; 
+    width: 300px;
+    min-height: 380px;
     background: rgb(255 255 255 / 65%);
     padding: 20px;
     border-radius: 10px;
@@ -186,8 +226,13 @@ main {
     cursor: pointer;
     background-color: rgb(84, 84, 233);
     transition: transform 0.2s ease;
+    perspective: 2000px;
     &:hover {
-        transform: scale(1.05);
+        transform: rotateX(14deg) rotateY(-14deg);
+        img {
+            transform: translateZ(40px) scale(1); 
+            filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 1)); 
+        }
     }
 
     .CardTopColor {
@@ -224,7 +269,11 @@ main {
         img {
             width: 300px;
             margin-top: 60px;
-            transition: 0.3s ease-in;
+            transform: translateZ(0);
+            transform-style: preserve-3d;
+            transition:
+                transform 0.35s ease,
+                filter 0.35s ease;
         }
 
         h2 {
@@ -269,47 +318,54 @@ main {
 .overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5); 
+    background: rgba(0, 0, 0, 0.5);
     width: 100%;
     height: 100dvh;
-    min-height: 120%; 
+    min-height: 120%;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 }
 
 .pokemon-overlay {
-    height: 850px; 
-    max-height: 650px; 
-    overflow-y: auto; 
-    padding: 20px; 
+    height: 850px;
+    max-height: 650px;
+    overflow-y: auto;
+    padding: 20px;
     overflow: hidden;
-    margin: 0 auto; 
+    margin: 0 auto;
     margin-bottom: 140px;
     .details {
-        margin-top: 24px;
+        margin-top: 8px;
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
+        align-items: center;
         color: rgb(75, 12, 46);
         font-weight: 700;
         font-size: 18px;
+        gap: 24px;
+        padding-left: 6px;
         .code {
-            padding-right: 28px;
+            font-size: 24px;
         }
         .name {
-            padding-right: 8px;
+            font-size: 24px;
         }
+    }
+    .overlay-abilities-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
         .abilities {
+            margin-top: 8px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             gap: 8px;
         }
     }
 }
 
 .overlay {
-    position: fixed; 
+    position: fixed;
     background: rgb(0 0 0 / 55%);
     top: 0;
     bottom: 0;
@@ -328,7 +384,6 @@ main {
         width: 360px;
         border-radius: 30px;
         box-shadow: 0px 0px 20px #979797;
-        padding: 30px;
         position: relative;
 
         img.logo {
@@ -448,31 +503,8 @@ main {
         &.d-none {
             display: none;
         }
-        /*.detail = der Wrapper für die Pokémon-Statistik-Blöcke
-                 .detail > div = Grid-Container für die einzelnen Stats (z. B. HP, Attack, Defense …)
-                 .detail > div > div = Flex-Container innerhalb jedes Stats, damit der Inhalt (Titel, Balken, etc.) sauber zentriert ist
-                 .detail                                    <-- Wrapper
-                  └── div (Grid-Container)             <-- display: grid
-                     ├── div (Flex-Container für 1. Stat)  <-- display: flex
-                     ├── div (Flex-Container für 2. Stat)
-                     └── div (Flex-Container für 3. Stat)   
-                  Grid-Container: verteilt die Stat-Blöcke nebeneinander oder nach Grid-Regeln
-                  Flex-Container: sorgt dafür, dass Inhalt jedes Blocks sauber zentriert ist    
-                  
-                  Ein Wrapper ist einfach ein Container-Element, das andere Elemente umhüllt.
-                  Meistens ein <div>
-                  Dient dazu, Struktur zu geben, Positionierung oder Layout zu kontrollieren
-                  Hat oft CSS-Regeln, um Inhalte zu gruppieren oder zu zentrieren
-                  <div class="detail">   <!-- Wrapper -->
-                    <div>              <!-- Grid-Container -->
-                        <div>...</div> <!-- Flex-Container / Item -->
-                        <div>...</div>
-                    </div>
-                  </div>
-                  
-                  */
+
         > div {
-            /* " > " sorgt dafür, dass nur die direkten Kinder von .detail betroffen sind. Untergeordnete divs, die tiefer verschachtelt sind, werden nicht verändert.*/
             display: grid;
             gap: 16px;
             text-align: center;
@@ -518,11 +550,11 @@ main {
 
 .progressbar {
     box-sizing: border-box;
-    height: 20px; 
+    height: 20px;
     position: relative;
     background: rgba(231, 103, 105, 0.3);
     border-radius: 25px;
-    border: 2px solid black; 
+    border: 2px solid black;
     overflow: hidden;
     flex: 1;
     padding-bottom: 4px;
@@ -534,13 +566,13 @@ main {
         border-bottom-right-radius: 8px;
         border-top-left-radius: 20px;
         border-bottom-left-radius: 20px;
-        background-color: rgb(6, 244, 26); 
+        background-color: rgb(6, 244, 26);
         box-shadow:
             inset 0 2px 9px rgba(1, 84, 12, 0.3),
             inset 0 -2px 6px rgba(4, 233, 65, 0.4);
-            position: relative;
-            overflow: hidden;
-       }
+        position: relative;
+        overflow: hidden;
+    }
 }
 
 .orange > span {
@@ -570,26 +602,25 @@ footer {
 
     .footer_container {
         width: 1440px;
-        padding: 30px 0;
         text-align: center;
         font-size: 16px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 10px;
-        p{
+        p {
             margin-block-start: 0;
-           margin-block-end: 0;
+            margin-block-end: 0;
         }
     }
 }
 
 @media (max-width: 1500px) {
     .overlay .pokemon-overlay {
-        margin-top: 40px; /* 🔽 schiebt Overlay nach unten */
+        margin-top: 40px; 
     }
-     .pokemon-overlay {
-        margin-bottom: 200px; 
+    .pokemon-overlay {
+        margin-bottom: 200px;
     }
 }
 
@@ -610,14 +641,14 @@ footer {
         }
     }
     .overlay {
-        align-items: flex-start; 
-        padding-top: 210px; 
+        align-items: flex-start;
+        padding-top: 210px;
         padding-bottom: 300px !important;
         top: -100px;
     }
 
     .pokemon-overlay {
-        margin: 0 auto; 
+        margin: 0 auto;
     }
 
     footer {
@@ -626,16 +657,30 @@ footer {
     }
 }
 
+@media (max-width: 874px) {
+    @keyframes text-bump {
+        0% {
+            transform: translateX(0);
+        }
+        40% {
+            transform: translateX(30px); 
+        }
+        100% {
+            transform: translateX(0); 
+        }
+    }
+}
+
 @media (max-width: 657px) {
     .overlay .pokemon-overlay {
         width: 320px;
     }
     .overlay .top img {
-        width: 280px; 
+        width: 280px;
     }
 
     .overlay-types {
-        font-size: 16px !important; 
+        font-size: 16px !important;
     }
 }
 
@@ -681,6 +726,17 @@ footer {
         .footer_container {
             padding-left: 0;
             padding-right: 0;
+        }
+    }
+    @keyframes text-bump {
+        0% {
+            transform: translateX(0);
+        }
+        40% {
+            transform: translateX(10px); 
+        }
+        100% {
+            transform: translateX(0);
         }
     }
 }
