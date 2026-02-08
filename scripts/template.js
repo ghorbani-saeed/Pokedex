@@ -1,7 +1,7 @@
 function getPokemonTemplate(pokemonDetail, isSearch = false) {
   const mainType = pokemonDetail.types[0].type.name; 
   const bgColor = typeColors[mainType] || "#888";    
-  const openVariable = isSearch ? "openSearchOverlay" : "openNormalOverlay"; //openVariable ist openSearchOverlay oder openNormalOverlay --> Wenn isSearch = false → "openOverlay"
+  const openVariable = isSearch ? "openSearchOverlay" : "openNormalOverlay"; 
   return `
     <div class="pokemon" onclick="${openVariable}(${pokemonDetail.id})">
       <div class="CardTopColor" style="background-color: ${bgColor};"></div>
