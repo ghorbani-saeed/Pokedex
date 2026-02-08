@@ -1,28 +1,34 @@
 const allPokemonsNemeAndLinkArray = []; 
 let currentSearchList = [];
+let currentPokemonId = null;
 let offset = 0; 
-const LIMIT = 20; 
+const LIMIT =20;
 
-document.addEventListener('DOMContentLoaded', () => {
-  const ball = document.getElementById('logo-rotate-sound');
-  const text = document.getElementById('text-move-sound'); 
-  const sound = document.getElementById('hit-sound');        
-  ball.addEventListener('click', () => { 
+function setupBallAnimation(ballId, textId, soundId) {
+  const ball = document.getElementById(ballId);
+  const text = document.getElementById(textId);
+  const sound = document.getElementById(soundId);
+  ball.addEventListener('click', () => {
     ball.classList.remove('ball-animate');
     text.classList.remove('text-animate');
     void ball.offsetWidth; 
     ball.classList.add('ball-animate');
-    setTimeout(() => {
-      text.classList.add('text-animate'); 
-      sound.currentTime = 0;
-      sound.play();  
-    }, 100);
-  });
-});
-  
+    setTimeout(() => { text.classList.add('text-animate');  sound.currentTime = 0; sound.play(); }, 100);  }); 
+}
+document.addEventListener('DOMContentLoaded', () => {setupBallAnimation('logo-animation', 'text-animation', 'hit-sound'); });
+
+function resetViaLogo() {
+    const inputField = document.getElementById("inputFieldId");
+    if (inputField) inputField.value = "";
+    currentSearchList = [];
+    changeToNormalState();
+    document.querySelector("body").classList.remove("blur-filter");
+    showBodyScroll();
+}
+
 async function init() {
   appearing();
-  await renedrePokemons(); 
+  await renderPokemons(); 
   hideLoader(); 
 } 
 
@@ -31,18 +37,18 @@ async function getData(url) {
   return await responsData.json();
 }
  
-async function renedrePokemons() {  
+async function renderPokemons() {  
   appearing(); 
   document.getElementById("load-more-button").style.display = "flex";
   const pokemons = await getData(`https://pokeapi.co/api/v2/pokemon?limit=${LIMIT}&offset=${offset}`); 
   const pokemonselement = document.getElementById("pokemons"); 
-    for (let i = 0; i < pokemons.results.length; i++) {
-      const pokemon = pokemons.results[i];
-      allPokemonsNemeAndLinkArray.push(pokemon);  
-      const pokemonDetail = await getData(pokemon.url); 
-      pokemonselement.innerHTML += getPokemonTemplate(pokemonDetail, "types-" + pokemonDetail.id); 
-      renderPokemonTypes(pokemonDetail, "types-" + pokemonDetail.id); 
-   }
+  for (let i = 0; i < pokemons.results.length; i++) {
+    const pokemon = pokemons.results[i];
+    allPokemonsNemeAndLinkArray.push(pokemon);  
+    const pokemonDetail = await getData(pokemon.url); 
+    pokemonselement.innerHTML += getPokemonTemplate(pokemonDetail, false); 
+    renderPokemonTypes(pokemonDetail, "types-" + pokemonDetail.id); 
+  }
   disappearing();
 }
 
@@ -87,9 +93,10 @@ function disappearing() {
   showBodyScroll();
 }
 
-async function openOverlay(pokemonId) {
+async function openNormalOverlay(pokemonId) {
+  currentPokemonId = pokemonId; 
   const pokemonDetail = await getData("https://pokeapi.co/api/v2/pokemon/" + pokemonId);
-  document.getElementById("overlay").innerHTML = getPokemonDetailTemp(pokemonDetail);
+  document.getElementById("overlay").innerHTML = getPokemonOverlayTemp(pokemonDetail);
   renderOverlayTypes(pokemonDetail, "overlay-types-" + pokemonDetail.id);
   renderStats(pokemonDetail);
   document.getElementById("overlay").classList.remove("d-none"); 
@@ -115,22 +122,20 @@ function closeDetail(clickedelement, event) {
   }
 }
 
-function nextPokemon(currentId) {
-    let isSearchActive = !document.getElementById("search-pokemons").classList.contains("d-none");
-    let list = isSearchActive ? currentSearchList : allPokemonsNemeAndLinkArray;
-    let index = list.findIndex(p => p.url.includes(`/${currentId}/`));
-    let nextIdx = (index + 1) % list.length;
-    let nextId = list[nextIdx].url.split('/').filter(Boolean).pop();
-    openOverlay(nextId);
+function nextPokemonNormal() {
+  let nextId = currentPokemonId + 1;
+  if (nextId > allPokemonsNemeAndLinkArray.length) {
+    nextId = 1;
+  }
+  openNormalOverlay(nextId);
 }
 
-function previousPokemon(currentId) {
-    let isSearchActive = !document.getElementById("search-pokemons").classList.contains("d-none");
-    let list = isSearchActive ? currentSearchList : allPokemonsNemeAndLinkArray;
-    let index = list.findIndex(p => p.url.includes(`/${currentId}/`));
-    let prevIdx = (index - 1 + list.length) % list.length;
-    let prevId = list[prevIdx].url.split('/').filter(Boolean).pop();
-    openOverlay(prevId);
+function previousPokemonNormal() {
+  let prevId = currentPokemonId - 1;
+  if (prevId < 1) {
+    prevId = allPokemonsNemeAndLinkArray.length;
+  }
+  openNormalOverlay(prevId);
 }
 
 function changeTab(clickedElement, tabId) {
@@ -157,7 +162,7 @@ function hideBodyScroll() {
 async function loadMorePokemon() {
   appearing();
   offset += LIMIT;
-  await renedrePokemons();
+  await renderPokemons();
 }
 
 function submitSearchForm(formElement, formEvent) { 
@@ -206,12 +211,55 @@ async function SearchNegativeOrPositive(searchPokemons, searchPokemonsElement){
     }
 }
  
+async function openSearchOverlay(pokemonId) {
+  const pokemonDetail = await getData("https://pokeapi.co/api/v2/pokemon/" + pokemonId);
+  document.getElementById("overlay").innerHTML = getPokemonSearchOverlayTemp(pokemonDetail);
+  renderOverlayTypes(pokemonDetail, "overlay-types-" + pokemonDetail.id);
+  renderStats(pokemonDetail);
+  document.getElementById("overlay").classList.remove("d-none");
+  hideBodyScroll();
+}
+
+
+function nextPokemonSearch(currentId) {
+  for (let i = 0; i < currentSearchList.length; i++) {
+    let url = currentSearchList[i].url;
+    if (url.includes("/" + currentId + "/")) {
+      let next = i + 1;
+      if (next >= currentSearchList.length) {
+        next = 0;
+      }
+      let nextUrl = currentSearchList[next].url;
+      let parts = nextUrl.split("/");
+      let id = parts[parts.length - 2];
+      openSearchOverlay(Number(id));
+      return;
+    }
+  }
+}
+
+function previousPokemonSearch(currentId) {
+  for (let i = 0; i < currentSearchList.length; i++) {
+    let url = currentSearchList[i].url;
+    if (url.includes("/" + currentId + "/")) {
+      let prev = i - 1;
+      if (prev < 0) {
+        prev = currentSearchList.length - 1;
+      }
+      let prevUrl = currentSearchList[prev].url;
+      let parts = prevUrl.split("/");
+      let id = parts[parts.length - 2];
+      openSearchOverlay(Number(id));
+      return;
+    }
+  }
+}
+
 function changeToNormalState() { 
   const pokemons = document.getElementById("pokemons");
   const searchPokemons = document.getElementById("search-pokemons");
   const loadMoreBtn = document.getElementById("load-more-button");
   const negativeResetBtn = document.getElementById("search-Negativ-result-btn-reset");
-
   if (pokemons) pokemons.classList.remove("d-none"); 
   if (searchPokemons) {
       searchPokemons.classList.add("d-none"); 
@@ -240,11 +288,3 @@ function resetNegativSearchBtn(){
     currentSearchList = [];
 }
 
-function resetViaLogo() {
-    const inputField = document.getElementById("inputFieldId");
-    if (inputField) inputField.value = "";
-    currentSearchList = [];
-    changeToNormalState();
-    document.querySelector("body").classList.remove("blur-filter");
-    showBodyScroll();
-}
